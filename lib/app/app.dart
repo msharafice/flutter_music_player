@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'theme/app_theme.dart';
+import '../features/music/presentation/pages/library_page.dart';
 
 class MusicPlayerApp extends StatelessWidget {
   const MusicPlayerApp({super.key});
@@ -13,7 +14,7 @@ class MusicPlayerApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: const Scaffold(body: Center(child: Text('Flutter Music Player'))),
+      home: const LibraryPage(),
     );
   }
 }
