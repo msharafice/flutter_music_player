@@ -1,17 +1,52 @@
-# flutter_music_player
+# Flutter Music Player
 
-A new Flutter project.
+A modern Android music player built with Flutter and Dart.
+
+This project aims to provide a clean, intuitive, and feature-rich music listening experience while following scalable software architecture principles.
+
+## Features
+
+### Planned Features
+- [ ] Browse and play local audio files
+- [ ] Background audio playback
+- [ ] Play, pause, skip, and seek controls
+- [ ] Create and manage playlists
+- [ ] Favorite tracks
+- [ ] Search music library
+- [ ] Recently played history
+- [ ] Dark and light themes
+- [ ] Lyrics support
+- [ ] Future support for online music playback
+
+## Tech Stack
+
+- **Flutter** – Cross-platform UI framework
+- **Dart** – Programming language
+- **Riverpod** – State management
+- **just_audio** – Audio playback
+- **audio_service** – Background audio support
+- **Drift** – Local database
+
+*Technologies will be integrated gradually as development progresses.*
+
+## Architecture
+
+The project follows a **Feature-First + Clean Architecture** approach to keep the codebase modular, maintainable, and scalable.
+
+## Project Status
+
+<badge color="warning">In Development</badge>
+
+This project is currently in its initial setup phase. Features and documentation will be updated throughout development.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+The project setup and installation instructions will be added as development progresses.
 
-A few resources to get you started if this is your first Flutter project:
+## Author
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+**[@msharafice](https://github.com/msharafice)**
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+Made with Flutter and ❤️
