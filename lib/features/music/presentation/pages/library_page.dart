@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../providers/track_provider.dart';
+import '../../../player/presentation/providers/player_provider.dart';
+import '../../../player/presentation/widgets/mini_player.dart';
 import '../../domain/entities/track.dart';
+import '../providers/track_provider.dart';
 
 class LibraryPage extends ConsumerWidget {
   const LibraryPage({super.key});
@@ -20,7 +22,21 @@ class LibraryPage extends ConsumerWidget {
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Center(
-                child: Text('No music found on your device.'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.music_off_outlined,
+                      size: 56,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'No music found on your device.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             ),
           ];
@@ -34,7 +50,14 @@ class LibraryPage extends ConsumerWidget {
                 (context, index) {
                   final track = tracks[index];
 
-                  return _buildTrackTile(track);
+                  return _buildTrackTile(
+                    track,
+                    onTap: () async {
+                      await ref
+                          .read(playbackControllerProvider.notifier)
+                          .playTrack(track, tracks);
+                    },
+                  );
                 },
                 childCount: tracks.length,
               ),
@@ -73,11 +96,12 @@ class LibraryPage extends ConsumerWidget {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
-                    TextButton(
+                    TextButton.icon(
                       onPressed: () {
                         ref.invalidate(tracksProvider);
                       },
-                      child: const Text('Try again'),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Try again'),
                     ),
                   ],
                 ),
@@ -116,7 +140,6 @@ class LibraryPage extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-
                     TextField(
                       decoration: InputDecoration(
                         hintText: 'Search songs, artists...',
@@ -132,9 +155,7 @@ class LibraryPage extends ConsumerWidget {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 28),
-
                     const Text(
                       'All tracks',
                       style: TextStyle(
@@ -142,39 +163,47 @@ class LibraryPage extends ConsumerWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),
             ),
-
             ...trackSlivers,
           ],
         ),
       ),
-
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.library_music_outlined),
-            selectedIcon: Icon(Icons.library_music),
-            label: 'Library',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite_border),
-            selectedIcon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.playlist_play),
-            label: 'Playlists',
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MiniPlayer(),
+          NavigationBar(
+            selectedIndex: 0,
+            destinations: [
+              NavigationDestination(
+                icon: Icon(Icons.library_music_outlined),
+                selectedIcon: Icon(Icons.library_music),
+                label: 'Library',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.favorite_border),
+                selectedIcon: Icon(Icons.favorite),
+                label: 'Favorites',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.playlist_play),
+                label: 'Playlists',
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTrackTile(Track track) {
+  Widget _buildTrackTile(
+    Track track, {
+    required VoidCallback onTap,
+  }) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 6),
       leading: Container(
@@ -190,7 +219,7 @@ class LibraryPage extends ConsumerWidget {
         ),
       ),
       title: Text(
-        track.title,
+        track.title.isEmpty ? 'Unknown track' : track.title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(
@@ -198,15 +227,12 @@ class LibraryPage extends ConsumerWidget {
         ),
       ),
       subtitle: Text(
-        track.artist,
+        track.artist.isEmpty ? 'Unknown artist' : track.artist,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: IconButton(
-        onPressed: () {},
-        icon: const Icon(Icons.more_vert),
-      ),
-      onTap: () {},
+      trailing: const Icon(Icons.more_vert),
+      onTap: onTap,
     );
   }
 }
