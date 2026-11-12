@@ -1,19 +1,92 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../providers/track_provider.dart';
+import '../../domain/entities/track.dart';
 
-class LibraryPage extends StatelessWidget {
+class LibraryPage extends ConsumerWidget {
   const LibraryPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final tracks = [
-      ('Midnight City', 'M83', Icons.music_note),
-      ('Starboy', 'The Weeknd', Icons.album),
-      ('Blinding Lights', 'The Weeknd', Icons.audiotrack),
-      ('After Hours', 'The Weeknd', Icons.music_note),
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tracksAsync = ref.watch(tracksProvider);
+
+    final trackSlivers = tracksAsync.when<List<Widget>>(
+      data: (tracks) {
+        if (tracks.isEmpty) {
+          return [
+            const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Text('No music found on your device.'),
+              ),
+            ),
+          ];
+        }
+
+        return [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final track = tracks[index];
+
+                  return _buildTrackTile(track);
+                },
+                childCount: tracks.length,
+              ),
+            ),
+          ),
+        ];
+      },
+      loading: () {
+        return [
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ];
+      },
+      error: (error, stackTrace) {
+        return [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Unable to load music.',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () {
+                        ref.invalidate(tracksProvider);
+                      },
+                      child: const Text('Try again'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ];
+      },
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -44,14 +117,14 @@ class LibraryPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    // Search field
                     TextField(
                       decoration: InputDecoration(
                         hintText: 'Search songs, artists...',
                         prefixIcon: const Icon(Icons.search),
                         filled: true,
                         fillColor: Theme.of(context)
-                            .colorScheme.surfaceContainerHighest
+                            .colorScheme
+                            .surfaceContainerHighest
                             .withValues(alpha: 0.5),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -62,73 +135,23 @@ class LibraryPage extends StatelessWidget {
 
                     const SizedBox(height: 28),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Recently played',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text('See all'),
-                        ),
-                      ],
+                    const Text(
+                      'All tracks',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
 
-            // Song list
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final track = tracks[index];
-
-                    return ListTile(
-                      contentPadding:
-                          const EdgeInsets.symmetric(vertical: 6),
-                      leading: Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          track.$3,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      title: Text(
-                        track.$1,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      subtitle: Text(track.$2),
-                      trailing: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.more_vert),
-                      ),
-                      onTap: () {},
-                    );
-                  },
-                  childCount: tracks.length,
-                ),
-              ),
-            ),
+            ...trackSlivers,
           ],
         ),
       ),
 
-      // Bottom navigation
       bottomNavigationBar: NavigationBar(
         selectedIndex: 0,
         destinations: const [
@@ -148,6 +171,42 @@ class LibraryPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTrackTile(Track track) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(vertical: 6),
+      leading: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(
+          Icons.music_note,
+          color: AppColors.primary,
+        ),
+      ),
+      title: Text(
+        track.title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        track.artist,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.more_vert),
+      ),
+      onTap: () {},
     );
   }
 }
