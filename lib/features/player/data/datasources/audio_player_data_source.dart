@@ -1,6 +1,7 @@
 
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 import '../../../music/domain/entities/track.dart';
 
@@ -16,9 +17,17 @@ class AudioPlayerDataSource {
 
     await session.setActive(true);
 
-    final sources = tracks
-        .map((track) => AudioSource.file(track.path))
-        .toList();
+    final sources = tracks.map((track) {
+      return AudioSource.file(
+        track.path,
+        tag: MediaItem(
+          id: track.id.toString(),
+          title: track.title.isEmpty ? 'Unknown track' : track.title,
+          artist: track.artist.isEmpty ? 'Unknown artist' : track.artist,
+          album: track.album,
+        ),
+      );
+    }).toList();
 
     await player.setAudioSources(
       sources,

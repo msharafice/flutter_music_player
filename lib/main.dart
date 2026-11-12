@@ -1,8 +1,23 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 import 'app/app.dart';
 
-void main() {
-  runApp(const ProviderScope(child: MusicPlayerApp()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await JustAudioBackground.init(
+    androidNotificationChannelId:
+        'com.msharafice.flutter_music_player.audio',
+    androidNotificationChannelName: 'Music Playback',
+    androidNotificationOngoing: true,
+  );
+
+  runApp(
+    const ProviderScope(
+      child: MusicPlayerApp(),
+    ),
+  );
 }
