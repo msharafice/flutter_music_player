@@ -1,4 +1,3 @@
-
 class Track {
   final int id;
   final String title;

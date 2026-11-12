@@ -1,12 +1,10 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../music/domain/entities/track.dart';
 import '../../data/datasources/audio_player_data_source.dart';
 
-final audioPlayerDataSourceProvider =
-    Provider<AudioPlayerDataSource>((ref) {
+final audioPlayerDataSourceProvider = Provider<AudioPlayerDataSource>((ref) {
   final dataSource = AudioPlayerDataSource();
 
   ref.onDispose(() {
@@ -17,24 +15,15 @@ final audioPlayerDataSourceProvider =
 });
 
 final playerStateStreamProvider = StreamProvider<PlayerState>((ref) {
-  return ref
-      .watch(audioPlayerDataSourceProvider)
-      .player
-      .playerStateStream;
+  return ref.watch(audioPlayerDataSourceProvider).player.playerStateStream;
 });
 
 final positionStreamProvider = StreamProvider<Duration>((ref) {
-  return ref
-      .watch(audioPlayerDataSourceProvider)
-      .player
-      .positionStream;
+  return ref.watch(audioPlayerDataSourceProvider).player.positionStream;
 });
 
 final durationStreamProvider = StreamProvider<Duration?>((ref) {
-  return ref
-      .watch(audioPlayerDataSourceProvider)
-      .player
-      .durationStream;
+  return ref.watch(audioPlayerDataSourceProvider).player.durationStream;
 });
 
 class PlaybackState {
@@ -49,9 +38,7 @@ class PlaybackState {
   });
 
   Track? get currentTrack {
-    if (queue.isEmpty ||
-        currentIndex < 0 ||
-        currentIndex >= queue.length) {
+    if (queue.isEmpty || currentIndex < 0 || currentIndex >= queue.length) {
       return null;
     }
 
@@ -73,39 +60,28 @@ class PlaybackState {
 }
 
 final playbackControllerProvider =
-    NotifierProvider<PlaybackController, PlaybackState>(
-  PlaybackController.new,
-);
+    NotifierProvider<PlaybackController, PlaybackState>(PlaybackController.new);
 
 class PlaybackController extends Notifier<PlaybackState> {
   @override
   PlaybackState build() {
     final dataSource = ref.read(audioPlayerDataSourceProvider);
 
-    final subscription = dataSource.player.currentIndexStream.listen(
-      (index) {
-        if (index != null &&
-            index >= 0 &&
-            index < state.queue.length) {
-          state = state.copyWith(currentIndex: index);
-        }
-      },
-    );
+    final subscription = dataSource.player.currentIndexStream.listen((index) {
+      if (index != null && index >= 0 && index < state.queue.length) {
+        state = state.copyWith(currentIndex: index);
+      }
+    });
 
     ref.onDispose(subscription.cancel);
 
     return const PlaybackState();
   }
 
-  Future<void> playTrack(
-    Track track,
-    List<Track> tracks,
-  ) async {
+  Future<void> playTrack(Track track, List<Track> tracks) async {
     if (tracks.isEmpty) return;
 
-    final index = tracks.indexWhere(
-      (item) => item.id == track.id,
-    );
+    final index = tracks.indexWhere((item) => item.id == track.id);
 
     if (index == -1) return;
 
@@ -116,9 +92,7 @@ class PlaybackController extends Notifier<PlaybackState> {
     );
 
     try {
-      await ref
-          .read(audioPlayerDataSourceProvider)
-          .playTracks(tracks, index);
+      await ref.read(audioPlayerDataSourceProvider).playTracks(tracks, index);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }

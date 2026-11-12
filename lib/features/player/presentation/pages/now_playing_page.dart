@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,39 +26,29 @@ class NowPlayingPage extends ConsumerWidget {
     if (track == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(
-          child: Text('No track selected.'),
-        ),
+        body: const Center(child: Text('No track selected.')),
       );
     }
 
-    final isPlaying =
-        playerState.asData?.value.playing ?? false;
+    final isPlaying = playerState.asData?.value.playing ?? false;
 
-    final position =
-        positionAsync.asData?.value ?? Duration.zero;
+    final position = positionAsync.asData?.value ?? Duration.zero;
 
     final duration =
-        durationAsync.asData?.value ??
-        Duration(milliseconds: track.duration);
+        durationAsync.asData?.value ?? Duration(milliseconds: track.duration);
 
-    final maxMilliseconds =
-        duration.inMilliseconds > 0
-            ? duration.inMilliseconds.toDouble()
-            : 1.0;
+    final maxMilliseconds = duration.inMilliseconds > 0
+        ? duration.inMilliseconds.toDouble()
+        : 1.0;
 
     final currentMilliseconds = position.inMilliseconds
         .clamp(0, maxMilliseconds.toInt())
         .toDouble();
 
-    final controller =
-        ref.read(playbackControllerProvider.notifier);
+    final controller = ref.read(playbackControllerProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Now Playing'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Now Playing'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -86,20 +75,14 @@ class NowPlayingPage extends ConsumerWidget {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 23,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 8),
 
             Text(
               track.artist,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
 
             const SizedBox(height: 35),
@@ -110,9 +93,7 @@ class NowPlayingPage extends ConsumerWidget {
               max: maxMilliseconds,
               activeColor: AppColors.primary,
               onChanged: (value) {
-                controller.seek(
-                  Duration(milliseconds: value.round()),
-                );
+                controller.seek(Duration(milliseconds: value.round()));
               },
             ),
 

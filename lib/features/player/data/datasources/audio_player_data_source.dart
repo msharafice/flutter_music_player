@@ -1,4 +1,3 @@
-
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -11,9 +10,7 @@ class AudioPlayerDataSource {
   Future<void> playTracks(List<Track> tracks, int initialIndex) async {
     final session = await AudioSession.instance;
 
-    await session.configure(
-      const AudioSessionConfiguration.music(),
-    );
+    await session.configure(const AudioSessionConfiguration.music());
 
     await session.setActive(true);
 
@@ -29,10 +26,7 @@ class AudioPlayerDataSource {
       );
     }).toList();
 
-    await player.setAudioSources(
-      sources,
-      initialIndex: initialIndex,
-    );
+    await player.setAudioSources(sources, initialIndex: initialIndex);
 
     await player.play();
   }

@@ -1,4 +1,3 @@
-
 import 'package:media_browser/simple_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -22,9 +21,7 @@ class TrackRepositoryImpl implements TrackRepository {
         );
       }
 
-      throw Exception(
-        'Audio permission was denied: $permissionStatus',
-      );
+      throw Exception('Audio permission was denied: $permissionStatus');
     }
 
     final audios = await _mediaQuery.queryAudios();
