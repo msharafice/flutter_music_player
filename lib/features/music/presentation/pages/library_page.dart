@@ -7,7 +7,9 @@ import '../../../player/presentation/providers/player_provider.dart';
 import '../../../player/presentation/widgets/mini_player.dart';
 import '../../domain/entities/track.dart';
 import '../providers/track_provider.dart';
+import '../providers/favorite_provider.dart';
 import '../widgets/track_tile.dart';
+import 'favorites_page.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -49,10 +51,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     final tracksAsync = ref.watch(tracksProvider);
+    final favoriteIdsAsync = ref.watch(favoriteIdsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -109,14 +111,25 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
                         return TrackTile(
                           track: track,
-                          onTap: () => _playTrack(track, tracks),
+                          isFavorite:
+                              favoriteIdsAsync.asData?.value.contains(
+                                track.id,
+                              ) ??
+                              false,
+                          onTap: () {
+                            _playTrack(track, tracks);
+                          },
+                          onFavoriteTap: () {
+                            ref
+                                .read(favoriteIdsProvider.notifier)
+                                .toggleFavorite(track.id);
+                          },
                         );
                       }, childCount: filteredTracks.length),
                     ),
                   ),
                 ];
               },
-
               loading: () => [
                 const SliverFillRemaining(
                   hasScrollBody: false,
@@ -125,7 +138,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   ),
                 ),
               ],
-
               error: (error, stackTrace) => [
                 SliverFillRemaining(
                   hasScrollBody: false,
@@ -136,7 +148,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           ],
         ),
       ),
-
       bottomNavigationBar: const MiniPlayer(),
     );
   }
@@ -165,9 +176,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Music Player', style: AppTextStyles.heading),
-
               const SizedBox(height: 4),
-
               Text(
                 'Your Music. Your Mood.',
                 style: AppTextStyles.subtitle.copyWith(fontSize: 13),
@@ -176,7 +185,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           ),
         ),
 
-        _headerIcon(icon: Icons.settings_outlined, onTap: () {}),
+        _headerIcon(
+          icon: Icons.favorite_border_rounded,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FavoritesPage()),
+            );
+          },
+        ),
       ],
     );
   }
@@ -352,7 +369,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text('Your Music', style: AppTextStyles.sectionTitle),
-
         if (count != null)
           Text(
             '$count tracks',
@@ -396,16 +412,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               size: 50,
               color: Colors.redAccent,
             ),
-
             const SizedBox(height: 12),
-
             const Text(
               'Unable to load music.',
               style: TextStyle(color: AppColors.darkTextPrimary),
             ),
-
             const SizedBox(height: 12),
-
             TextButton.icon(
               onPressed: () {
                 ref.invalidate(tracksProvider);

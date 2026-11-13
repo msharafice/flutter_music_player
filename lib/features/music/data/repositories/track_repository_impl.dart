@@ -1,4 +1,3 @@
-
 import 'package:media_browser/simple_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
 

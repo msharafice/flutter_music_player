@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../music/domain/entities/track.dart';
+import '../../../music/presentation/providers/favorite_provider.dart';
 import '../providers/player_provider.dart';
 
 class NowPlayingPage extends ConsumerWidget {
@@ -38,6 +38,11 @@ class NowPlayingPage extends ConsumerWidget {
         ),
       );
     }
+
+    final favoriteIdsAsync = ref.watch(favoriteIdsProvider);
+
+    final isFavorite =
+        favoriteIdsAsync.asData?.value.contains(track.id) ?? false;
 
     final controller = ref.read(playbackControllerProvider.notifier);
 
@@ -135,7 +140,42 @@ class NowPlayingPage extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 12),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      ref
+                          .read(favoriteIdsProvider.notifier)
+                          .toggleFavorite(track.id);
+                    },
+                    tooltip: isFavorite
+                        ? 'Remove from favorites'
+                        : 'Add to favorites',
+                    icon: Icon(
+                      isFavorite
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      color: isFavorite
+                          ? AppColors.primaryLight
+                          : AppColors.darkTextSecondary,
+                      size: 27,
+                    ),
+                  ),
+
+                  Text(
+                    isFavorite ? 'Added to Favorites' : 'Add to Favorites',
+                    style: const TextStyle(
+                      color: AppColors.darkTextSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
 
               SliderTheme(
                 data: SliderTheme.of(context).copyWith(
@@ -206,10 +246,7 @@ class NowPlayingPage extends ConsumerWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: const LinearGradient(
-                        colors: [
-                          AppColors.primaryLight,
-                          AppColors.primaryDark,
-                        ],
+                        colors: [AppColors.primaryLight, AppColors.primaryDark],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -294,11 +331,7 @@ class NowPlayingPage extends ConsumerWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Color(0xFF30145F),
-            Color(0xFF17132C),
-            Color(0xFF090914),
-          ],
+          colors: [Color(0xFF30145F), Color(0xFF17132C), Color(0xFF090914)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

@@ -6,8 +6,16 @@ import '../../domain/entities/track.dart';
 class TrackTile extends StatelessWidget {
   final Track track;
   final VoidCallback onTap;
+  final bool isFavorite;
+  final VoidCallback? onFavoriteTap;
 
-  const TrackTile({super.key, required this.track, required this.onTap});
+  const TrackTile({
+    super.key,
+    required this.track,
+    required this.onTap,
+    this.isFavorite = false,
+    this.onFavoriteTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +81,28 @@ class TrackTile extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(width: 8),
+                if (onFavoriteTap != null) ...[
+                  const SizedBox(width: 4),
+
+                  IconButton(
+                    onPressed: onFavoriteTap,
+                    tooltip: isFavorite
+                        ? 'Remove from favorites'
+                        : 'Add to favorites',
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(
+                      isFavorite
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      color: isFavorite
+                          ? AppColors.primaryLight
+                          : AppColors.darkTextSecondary,
+                      size: 22,
+                    ),
+                  ),
+                ],
+
+                const SizedBox(width: 4),
 
                 const Icon(
                   Icons.play_circle_outline_rounded,
