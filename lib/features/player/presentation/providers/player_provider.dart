@@ -26,6 +26,10 @@ final durationStreamProvider = StreamProvider<Duration?>((ref) {
   return ref.watch(audioPlayerDataSourceProvider).player.durationStream;
 });
 
+final loopModeStreamProvider = StreamProvider<LoopMode>((ref) {
+  return ref.watch(audioPlayerDataSourceProvider).player.loopModeStream;
+});
+
 class PlaybackState {
   final List<Track> queue;
   final int currentIndex;
@@ -112,5 +116,17 @@ class PlaybackController extends Notifier<PlaybackState> {
 
   Future<void> seek(Duration position) async {
     await ref.read(audioPlayerDataSourceProvider).seek(position);
+  }
+
+  Future<void> shuffleToRandomTrack() async {
+    final queueLength = state.queue.length;
+
+    if (queueLength < 2) return;
+
+    await ref.read(audioPlayerDataSourceProvider).playRandomTrack(queueLength);
+  }
+
+  Future<void> cycleLoopMode() async {
+    await ref.read(audioPlayerDataSourceProvider).cycleLoopMode();
   }
 }

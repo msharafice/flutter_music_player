@@ -1,3 +1,4 @@
+
 import 'package:media_browser/simple_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -26,7 +27,7 @@ class TrackRepositoryImpl implements TrackRepository {
 
     final audios = await _mediaQuery.queryAudios();
 
-    return audios.map((audio) {
+    final tracks = audios.map((audio) {
       return Track(
         id: audio.id,
         title: audio.title,
@@ -34,8 +35,10 @@ class TrackRepositoryImpl implements TrackRepository {
         album: audio.album,
         path: audio.data,
         duration: audio.duration,
-        artwork: audio.artwork,
+        artwork: null,
       );
     }).toList();
+
+    return tracks;
   }
 }

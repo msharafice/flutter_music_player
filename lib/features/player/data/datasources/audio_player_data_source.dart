@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -6,6 +8,8 @@ import '../../../music/domain/entities/track.dart';
 
 class AudioPlayerDataSource {
   final AudioPlayer player = AudioPlayer();
+
+  final Random _random = Random();
 
   Future<void> playTracks(List<Track> tracks, int initialIndex) async {
     final session = await AudioSession.instance;
@@ -67,6 +71,48 @@ class AudioPlayerDataSource {
 
   Future<void> seek(Duration position) async {
     await player.seek(position);
+  }
+
+  Future<void> playRandomTrack(int queueLength) async {
+    if (queueLength < 2) return;
+
+    // Make sure the persistent shuffle mode is disabled.
+    if (player.shuffleModeEnabled) {
+      await player.setShuffleModeEnabled(false);
+    }
+
+    final currentIndex = player.currentIndex ?? 0;
+
+    // Generate a random index different from the current one.
+    var randomIndex = _random.nextInt(queueLength - 1);
+
+    if (randomIndex >= currentIndex) {
+      randomIndex++;
+    }
+
+    await player.seek(Duration.zero, index: randomIndex);
+
+    await player.play();
+  }
+
+  Future<void> cycleLoopMode() async {
+    final LoopMode nextMode;
+
+    switch (player.loopMode) {
+      case LoopMode.off:
+        nextMode = LoopMode.all;
+        break;
+
+      case LoopMode.all:
+        nextMode = LoopMode.one;
+        break;
+
+      case LoopMode.one:
+        nextMode = LoopMode.off;
+        break;
+    }
+
+    await player.setLoopMode(nextMode);
   }
 
   Future<void> dispose() async {
