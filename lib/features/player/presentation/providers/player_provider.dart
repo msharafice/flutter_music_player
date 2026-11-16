@@ -1,7 +1,11 @@
+
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../music/domain/entities/track.dart';
+import '../../../music/presentation/providers/history_provider.dart';
 import '../../data/datasources/audio_player_data_source.dart';
 
 final audioPlayerDataSourceProvider = Provider<AudioPlayerDataSource>((ref) {
@@ -64,7 +68,9 @@ class PlaybackState {
 }
 
 final playbackControllerProvider =
-    NotifierProvider<PlaybackController, PlaybackState>(PlaybackController.new);
+    NotifierProvider<PlaybackController, PlaybackState>(
+  PlaybackController.new,
+);
 
 class PlaybackController extends Notifier<PlaybackState> {
   @override
@@ -74,12 +80,26 @@ class PlaybackController extends Notifier<PlaybackState> {
     final subscription = dataSource.player.currentIndexStream.listen((index) {
       if (index != null && index >= 0 && index < state.queue.length) {
         state = state.copyWith(currentIndex: index);
+
+        final track = state.queue[index];
+        _recordHistory(track);
       }
     });
 
     ref.onDispose(subscription.cancel);
 
     return const PlaybackState();
+  }
+
+  void _recordHistory(Track track) {
+    unawaited(
+      ref
+          .read(trackHistoryProvider.notifier)
+          .addTrack(track)
+          .catchError((Object error) {
+        // A history storage error must not interrupt audio playback.
+      }),
+    );
   }
 
   Future<void> playTrack(Track track, List<Track> tracks) async {
@@ -97,6 +117,9 @@ class PlaybackController extends Notifier<PlaybackState> {
 
     try {
       await ref.read(audioPlayerDataSourceProvider).playTracks(tracks, index);
+
+      // Record the selected track after playback starts successfully.
+      _recordHistory(track);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
