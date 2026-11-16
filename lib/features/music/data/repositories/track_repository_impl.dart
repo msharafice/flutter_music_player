@@ -1,13 +1,15 @@
-import 'package:media_browser/simple_audio_query.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../domain/entities/track.dart';
 import '../../domain/repositories/track_repository.dart';
+import '../datasources/local_audio_data_source.dart';
+import '../models/track_model.dart';
 
 class TrackRepositoryImpl implements TrackRepository {
-  final SimpleMediaQuery _mediaQuery;
+  final LocalAudioDataSource _dataSource;
 
-  TrackRepositoryImpl(this._mediaQuery);
+  TrackRepositoryImpl(this._dataSource);
 
   @override
   Future<List<Track>> getTracks() async {
@@ -21,21 +23,15 @@ class TrackRepositoryImpl implements TrackRepository {
         );
       }
 
-      throw Exception('Audio permission was denied: $permissionStatus');
+      throw Exception(
+        'Audio permission was denied: $permissionStatus',
+      );
     }
 
-    final audios = await _mediaQuery.queryAudios();
+    final audios = await _dataSource.getAudios();
 
     final tracks = audios.map((audio) {
-      return Track(
-        id: audio.id,
-        title: audio.title,
-        artist: audio.artist,
-        album: audio.album,
-        path: audio.data,
-        duration: audio.duration,
-        artwork: null,
-      );
+      return TrackModel.fromAudioModel(audio).toEntity();
     }).toList();
 
     return tracks;

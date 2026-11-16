@@ -1,3 +1,4 @@
+
 class Track {
   final int id;
   final String title;
@@ -7,6 +8,11 @@ class Track {
   final int duration;
   final String? artwork;
 
+  final DateTime? dateAdded;
+  final int? year;
+  final int fileSize;
+  final DateTime? dateModified;
+
   const Track({
     required this.id,
     required this.title,
@@ -15,5 +21,9 @@ class Track {
     required this.path,
     required this.duration,
     this.artwork,
+    this.dateAdded,
+    this.year,
+    this.fileSize = 0,
+    this.dateModified,
   });
 }
