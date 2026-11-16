@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,7 +37,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   final TextEditingController _searchController = TextEditingController();
 
   String _searchQuery = '';
-
   TrackSortOption _sortOption = TrackSortOption.nameAZ;
 
   String? _selectedArtist;
@@ -56,7 +54,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     if (a == null && b == null) return 0;
     if (a == null) return 1;
     if (b == null) return -1;
-
     return b.compareTo(a);
   }
 
@@ -64,7 +61,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     if (a == null && b == null) return 0;
     if (a == null) return 1;
     if (b == null) return -1;
-
     return b.compareTo(a);
   }
 
@@ -72,7 +68,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     final query = _searchQuery.trim().toLowerCase();
 
     final result = tracks.where((track) {
-      final matchesSearch = query.isEmpty ||
+      final matchesSearch =
+          query.isEmpty ||
           track.title.toLowerCase().contains(query) ||
           track.artist.toLowerCase().contains(query) ||
           track.album.toLowerCase().contains(query);
@@ -88,70 +85,48 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     switch (_sortOption) {
       case TrackSortOption.dateAdded:
-        result.sort(
-          (a, b) => _compareDateNewest(
-            a.dateAdded,
-            b.dateAdded,
-          ),
-        );
+        result.sort((a, b) => _compareDateNewest(a.dateAdded, b.dateAdded));
         break;
 
       case TrackSortOption.nameAZ:
         result.sort(
-          (a, b) => a.title.toLowerCase().compareTo(
-                b.title.toLowerCase(),
-              ),
+          (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
         );
         break;
 
       case TrackSortOption.nameZA:
         result.sort(
-          (a, b) => b.title.toLowerCase().compareTo(
-                a.title.toLowerCase(),
-              ),
+          (a, b) => b.title.toLowerCase().compareTo(a.title.toLowerCase()),
         );
         break;
 
       case TrackSortOption.artist:
         result.sort(
-          (a, b) => a.artist.toLowerCase().compareTo(
-                b.artist.toLowerCase(),
-              ),
+          (a, b) => a.artist.toLowerCase().compareTo(b.artist.toLowerCase()),
         );
         break;
 
       case TrackSortOption.album:
         result.sort(
-          (a, b) => a.album.toLowerCase().compareTo(
-                b.album.toLowerCase(),
-              ),
+          (a, b) => a.album.toLowerCase().compareTo(b.album.toLowerCase()),
         );
         break;
 
       case TrackSortOption.duration:
-        result.sort(
-          (a, b) => a.duration.compareTo(b.duration),
-        );
+        result.sort((a, b) => a.duration.compareTo(b.duration));
         break;
 
       case TrackSortOption.year:
-        result.sort(
-          (a, b) => _compareIntDescending(a.year, b.year),
-        );
+        result.sort((a, b) => _compareIntDescending(a.year, b.year));
         break;
 
       case TrackSortOption.size:
-        result.sort(
-          (a, b) => b.fileSize.compareTo(a.fileSize),
-        );
+        result.sort((a, b) => b.fileSize.compareTo(a.fileSize));
         break;
 
       case TrackSortOption.dateModified:
         result.sort(
-          (a, b) => _compareDateNewest(
-            a.dateModified,
-            b.dateModified,
-          ),
+          (a, b) => _compareDateNewest(a.dateModified, b.dateModified),
         );
         break;
 
@@ -162,9 +137,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         };
 
         result.sort(
-          (a, b) => (order[a.id] ?? 999999).compareTo(
-            order[b.id] ?? 999999,
-          ),
+          (a, b) => (order[a.id] ?? 999999).compareTo(order[b.id] ?? 999999),
         );
         break;
     }
@@ -172,16 +145,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     return result;
   }
 
-  void _changeSortOption(
-    TrackSortOption option,
-    List<Track> tracks,
-  ) {
+  void _changeSortOption(TrackSortOption option, List<Track> tracks) {
     setState(() {
       _sortOption = option;
 
       if (option == TrackSortOption.random) {
-        _randomTrackIds = tracks.map((track) => track.id).toList()
-          ..shuffle();
+        _randomTrackIds = tracks.map((track) => track.id).toList()..shuffle();
       }
     });
   }
@@ -196,28 +165,28 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     String? tempArtist = _selectedArtist;
     String? tempAlbum = _selectedAlbum;
 
-    final artists = tracks
-        .map((track) => track.artist)
-        .where((artist) => artist.trim().isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final artists =
+        tracks
+            .map((track) => track.artist)
+            .where((artist) => artist.trim().isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
 
-    final albums = tracks
-        .map((track) => track.album)
-        .where((album) => album.trim().isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final albums =
+        tracks
+            .map((track) => track.album)
+            .where((album) => album.trim().isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
 
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.darkSurface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (sheetContext) {
         return StatefulBuilder(
@@ -284,12 +253,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                             },
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.primaryLight,
-                              side: const BorderSide(
-                                color: AppColors.primary,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 14,
-                              ),
+                              side: const BorderSide(color: AppColors.primary),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: const Text('Reset'),
                           ),
@@ -302,15 +267,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                                 _selectedArtist = tempArtist;
                                 _selectedAlbum = tempAlbum;
                               });
-
                               Navigator.pop(sheetContext);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 14,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: const Text('Apply Filters'),
                           ),
@@ -350,9 +312,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           decoration: BoxDecoration(
             color: AppColors.darkBackground,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: AppColors.border.withValues(alpha: 0.6),
-            ),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
           ),
           child: DropdownButton<String>(
             value: value,
@@ -375,10 +335,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               fontSize: 14,
             ),
             items: [
-              DropdownMenuItem<String>(
-                value: null,
-                child: Text(hint),
-              ),
+              DropdownMenuItem<String>(value: null, child: Text(hint)),
               ...items.map(
                 (item) => DropdownMenuItem<String>(
                   value: item,
@@ -411,21 +368,21 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-              sliver: SliverToBoxAdapter(
-                child: _buildHeader(),
-              ),
+              sliver: SliverToBoxAdapter(child: _buildHeader()),
             ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverToBoxAdapter(child: _buildHeroBanner(tracksAsync)),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
               sliver: SliverToBoxAdapter(
-                child: _buildHeroBanner(tracksAsync),
+                child: _buildLibraryOverview(tracksAsync),
               ),
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 28, 20, 16),
-              sliver: SliverToBoxAdapter(
-                child: _buildSearchField(),
-              ),
+              sliver: SliverToBoxAdapter(child: _buildSearchField()),
             ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -448,12 +405,16 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: _buildEmptyState(
-                        tracks.isEmpty
-                            ? 'No music found on your device.'
-                            : 'No matching songs found.',
-                        tracks.isEmpty
-                            ? Icons.music_off_rounded
+                        title: tracks.isEmpty
+                            ? 'Your library is empty'
+                            : 'No matching tracks',
+                        message: tracks.isEmpty
+                            ? 'Add music files to your device and refresh your library.'
+                            : 'Try another search or clear the selected filters.',
+                        icon: tracks.isEmpty
+                            ? Icons.library_music_outlined
                             : Icons.search_off_rounded,
+                        showReset: tracks.isNotEmpty,
                       ),
                     ),
                   ];
@@ -463,41 +424,34 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final track = filteredTracks[index];
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final track = filteredTracks[index];
 
-                          return TrackTile(
-                            track: track,
-                            isFavorite:
-                                favoriteIdsAsync.asData?.value.contains(
-                                      track.id,
-                                    ) ??
-                                    false,
-                            onTap: () {
-                              _playTrack(track, tracks);
-                            },
-                            onFavoriteTap: () {
-                              ref
-                                  .read(favoriteIdsProvider.notifier)
-                                  .toggleFavorite(track.id);
-                            },
-                          );
-                        },
-                        childCount: filteredTracks.length,
-                      ),
+                        return TrackTile(
+                          track: track,
+                          isFavorite:
+                              favoriteIdsAsync.asData?.value.contains(
+                                track.id,
+                              ) ??
+                              false,
+                          onTap: () {
+                            _playTrack(track, tracks);
+                          },
+                          onFavoriteTap: () {
+                            ref
+                                .read(favoriteIdsProvider.notifier)
+                                .toggleFavorite(track.id);
+                          },
+                        );
+                      }, childCount: filteredTracks.length),
                     ),
                   ),
                 ];
               },
               loading: () => [
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary,
-                    ),
-                  ),
+                  child: _buildLoadingState(),
                 ),
               ],
               error: (error, stackTrace) => [
@@ -516,9 +470,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   Widget _buildLibraryControls(AsyncValue<List<Track>> tracksAsync) {
     final tracks = tracksAsync.asData?.value;
-
-    final hasActiveFilters =
-        _selectedArtist != null || _selectedAlbum != null;
+    final hasActiveFilters = _selectedArtist != null || _selectedAlbum != null;
 
     return Wrap(
       spacing: 10,
@@ -530,9 +482,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           decoration: BoxDecoration(
             color: AppColors.darkSurface,
             borderRadius: BorderRadius.circular(13),
-            border: Border.all(
-              color: AppColors.border.withValues(alpha: 0.6),
-            ),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -614,9 +564,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 ? AppColors.primary.withValues(alpha: 0.18)
                 : AppColors.darkSurface,
             side: BorderSide(
-              color: hasActiveFilters
-                  ? AppColors.primary
-                  : AppColors.border,
+              color: hasActiveFilters ? AppColors.primary : AppColors.border,
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(13),
@@ -653,10 +601,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Music Player',
-                style: AppTextStyles.heading,
-              ),
+              const Text('Music Player', style: AppTextStyles.heading),
               const SizedBox(height: 4),
               Text(
                 'Your Music. Your Mood.',
@@ -666,35 +611,32 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           ),
         ),
         _headerIcon(
+          tooltip: 'Playlists',
           icon: Icons.queue_music_rounded,
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const PlaylistsPage(),
-              ),
+              MaterialPageRoute(builder: (_) => const PlaylistsPage()),
             );
           },
         ),
         _headerIcon(
+          tooltip: 'Recently played',
           icon: Icons.history_rounded,
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const HistoryPage(),
-              ),
+              MaterialPageRoute(builder: (_) => const HistoryPage()),
             );
           },
         ),
         _headerIcon(
+          tooltip: 'Favorites',
           icon: Icons.favorite_border_rounded,
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const FavoritesPage(),
-              ),
+              MaterialPageRoute(builder: (_) => const FavoritesPage()),
             );
           },
         ),
@@ -704,29 +646,23 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   Widget _headerIcon({
     required IconData icon,
+    required String tooltip,
     required VoidCallback onTap,
   }) {
     return IconButton(
+      tooltip: tooltip,
       onPressed: onTap,
-      icon: Icon(
-        icon,
-        color: AppColors.darkTextSecondary,
-        size: 25,
-      ),
+      icon: Icon(icon, color: AppColors.darkTextSecondary, size: 25),
     );
   }
 
   Widget _buildHeroBanner(AsyncValue<List<Track>> tracksAsync) {
     return Container(
-      height: 155,
+      height: 148,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF7437EF),
-            Color(0xFF4D42C8),
-            Color(0xFF2458B7),
-          ],
+          colors: [Color(0xFF7437EF), Color(0xFF4D42C8), Color(0xFF2458B7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -739,6 +675,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         ],
       ),
       child: Stack(
+        clipBehavior: Clip.hardEdge,
         children: [
           Positioned(
             right: -25,
@@ -762,28 +699,30 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(22),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
                   'Enjoy Your Music!',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 const Text(
                   'Every moment has its own sound.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white70,
-                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: Colors.white70),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 10),
                 Material(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
@@ -799,7 +738,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     child: const Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 17,
-                        vertical: 9,
+                        vertical: 7,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -836,16 +775,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       decoration: BoxDecoration(
         color: AppColors.darkSurface,
         borderRadius: BorderRadius.circular(17),
-        border: Border.all(
-          color: AppColors.border.withValues(alpha: 0.6),
-        ),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
       ),
       child: TextField(
         controller: _searchController,
-        style: const TextStyle(
-          color: AppColors.darkTextPrimary,
-          fontSize: 14,
-        ),
+        style: const TextStyle(color: AppColors.darkTextPrimary, fontSize: 14),
         onChanged: (value) {
           setState(() => _searchQuery = value);
         },
@@ -865,10 +799,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     _searchController.clear();
                     setState(() => _searchQuery = '');
                   },
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    size: 20,
-                  ),
+                  icon: const Icon(Icons.close_rounded, size: 20),
                 )
               : null,
           border: InputBorder.none,
@@ -878,58 +809,307 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
   }
 
-  Widget _buildSectionHeader(AsyncValue<List<Track>> tracksAsync) {
-    final tracks = tracksAsync.asData?.value;
+  Widget _buildLibraryOverview(AsyncValue<List<Track>> tracksAsync) {
+    return tracksAsync.when(
+      data: (tracks) {
+        final artistCount = tracks
+            .map((track) => track.artist.trim())
+            .where((artist) => artist.isNotEmpty)
+            .toSet()
+            .length;
 
-    if (tracks == null) {
-      return const Text(
-        'Your Music',
-        style: AppTextStyles.sectionTitle,
-      );
-    }
+        final albumCount = tracks
+            .map((track) => track.album.trim())
+            .where((album) => album.isNotEmpty)
+            .toSet()
+            .length;
 
-    final visibleCount = _filterAndSortTracks(tracks).length;
+        final visibleCount = _filterAndSortTracks(tracks).length;
 
-    final hasActiveSearch = _searchQuery.trim().isNotEmpty;
-    final hasActiveFilters =
-        _selectedArtist != null || _selectedAlbum != null;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Your Music',
-          style: AppTextStyles.sectionTitle,
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+          decoration: BoxDecoration(
+            color: AppColors.darkSurface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Expanded(
+                    child: Text('YOUR COLLECTION', style: AppTextStyles.label),
+                  ),
+                  if (_searchQuery.trim().isNotEmpty ||
+                      _selectedArtist != null ||
+                      _selectedAlbum != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '$visibleCount visible',
+                        style: const TextStyle(
+                          color: AppColors.primaryLight,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildOverviewMetric(
+                      icon: Icons.music_note_rounded,
+                      value: tracks.length.toString(),
+                      label: 'Songs',
+                    ),
+                  ),
+                  _overviewDivider(),
+                  Expanded(
+                    child: _buildOverviewMetric(
+                      icon: Icons.mic_none_rounded,
+                      value: artistCount.toString(),
+                      label: 'Artists',
+                    ),
+                  ),
+                  _overviewDivider(),
+                  Expanded(
+                    child: _buildOverviewMetric(
+                      icon: Icons.album_outlined,
+                      value: albumCount.toString(),
+                      label: 'Albums',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => Container(
+        height: 105,
+        decoration: BoxDecoration(
+          color: AppColors.darkSurface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.border),
         ),
-        Text(
-          hasActiveSearch || hasActiveFilters
-              ? '$visibleCount of ${tracks.length} tracks'
-              : '${tracks.length} tracks',
-          style: AppTextStyles.subtitle.copyWith(
+        alignment: Alignment.center,
+        child: const SizedBox(
+          width: 22,
+          height: 22,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.2,
             color: AppColors.primaryLight,
+          ),
+        ),
+      ),
+      error: (_, _) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildOverviewMetric({
+    required IconData icon,
+    required String value,
+    required String label,
+  }) {
+    return Column(
+      children: [
+        Icon(icon, color: AppColors.primaryLight, size: 19),
+        const SizedBox(height: 7),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppColors.darkTextPrimary,
+            fontSize: 19,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.darkTextSecondary,
+            fontSize: 11,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEmptyState(String message, IconData icon) {
+  Widget _overviewDivider() {
+    return Container(width: 1, height: 48, color: AppColors.border);
+  }
+
+  Widget _buildSectionHeader(AsyncValue<List<Track>> tracksAsync) {
+    final tracks = tracksAsync.asData?.value;
+    final visibleCount = tracks == null
+        ? null
+        : _filterAndSortTracks(tracks).length;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Your Music', style: AppTextStyles.sectionTitle),
+              SizedBox(height: 4),
+              Text(
+                'All your tracks in one place',
+                style: AppTextStyles.subtitle,
+              ),
+            ],
+          ),
+        ),
+        if (tracks != null)
+          Text(
+            visibleCount == tracks.length
+                ? '${tracks.length} tracks'
+                : '$visibleCount / ${tracks.length} tracks',
+            style: AppTextStyles.subtitle.copyWith(
+              color: AppColors.primaryLight,
+              fontWeight: FontWeight.w600,
+            ),
+          )
+        else
+          const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primaryLight,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState({
+    required String title,
+    required String message,
+    required IconData icon,
+    required bool showReset,
+  }) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(30, 24, 30, 50),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 58,
-              color: AppColors.primaryLight,
+            Container(
+              width: 104,
+              height: 104,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withValues(alpha: 0.12),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.25),
+                ),
+              ),
+              child: Icon(icon, size: 48, color: AppColors.primaryLight),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 22),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.sectionTitle,
+            ),
+            const SizedBox(height: 9),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: AppTextStyles.subtitle.copyWith(fontSize: 14),
+              style: AppTextStyles.subtitle.copyWith(height: 1.6),
+            ),
+            if (showReset) ...[
+              const SizedBox(height: 20),
+              OutlinedButton.icon(
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() {
+                    _searchQuery = '';
+                    _selectedArtist = null;
+                    _selectedAlbum = null;
+                  });
+                },
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Clear Search & Filters'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primaryLight,
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withValues(alpha: 0.12),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(22),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: AppColors.primaryLight,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Scanning your music',
+              style: TextStyle(
+                color: AppColors.darkTextPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 7),
+            const Text(
+              'Please wait while we prepare your library.',
+              textAlign: TextAlign.center,
+              style: AppTextStyles.subtitle,
+            ),
+            const SizedBox(height: 24),
+            ...List.generate(
+              3,
+              (index) => Container(
+                height: 66,
+                margin: const EdgeInsets.only(bottom: 9),
+                decoration: BoxDecoration(
+                  color: AppColors.darkSurface,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(
+                    color: AppColors.border.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -952,9 +1132,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             const SizedBox(height: 12),
             const Text(
               'Unable to load music.',
-              style: TextStyle(
-                color: AppColors.darkTextPrimary,
-              ),
+              style: TextStyle(color: AppColors.darkTextPrimary),
             ),
             const SizedBox(height: 12),
             TextButton.icon(

@@ -17,8 +17,18 @@ class TrackTile extends StatelessWidget {
     this.onFavoriteTap,
   });
 
+  String _formatDuration(int milliseconds) {
+    final totalSeconds = milliseconds ~/ 1000;
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final artist = track.artist.trim().isEmpty ? 'Unknown artist' : track.artist;
+    final album = track.album.trim().isEmpty ? 'Unknown album' : track.album;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Material(
@@ -68,14 +78,28 @@ class TrackTile extends StatelessWidget {
 
                       const SizedBox(height: 6),
 
-                      Text(
-                        track.artist.isEmpty ? 'Unknown artist' : track.artist,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.darkTextSecondary,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '$artist  •  $album',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.darkTextSecondary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _formatDuration(track.duration),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: AppColors.darkTextSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
