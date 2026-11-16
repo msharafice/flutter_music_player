@@ -10,6 +10,7 @@ import '../providers/track_provider.dart';
 import '../providers/favorite_provider.dart';
 import '../widgets/track_tile.dart';
 import 'favorites_page.dart';
+import 'playlists_page.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -185,6 +186,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           ),
         ),
 
+        // Playlists
+        _headerIcon(
+          icon: Icons.queue_music_rounded,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PlaylistsPage()),
+            );
+          },
+        ),
+
+        // Favorites
         _headerIcon(
           icon: Icons.favorite_border_rounded,
           onTap: () {
